@@ -12,24 +12,24 @@ interface UserInterface {
 
 @Entity()
 export class User{
-    constructor(data: UserInterface) {
-        this.firstName = data.firstName
-        this.lastName = data.lastName
-        this.email = data.email
-    } 
-
     @PrimaryGeneratedColumn()
     id?: number
 
     @Column()
-    firstName: string
+    firstName: string = '' 
 
     @Column()
-    lastName: string
+    lastName: string = ''
 
-    @Column()
-    email: string
+    @Column({ unique: true })
+    email: string = ''
 
-    @OneToMany(() => Post, (post) => post.userId)
+    @OneToMany(() => Post, (post) => post.user)
     posts?: Post[]
+
+    constructor(data?: UserInterface) {
+        if (data) {
+            Object.assign(this, data)
+        }
+    }
 }
