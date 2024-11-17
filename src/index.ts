@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import 'reflect-metadata';
 import express from 'express';
 import { DataSource } from 'typeorm';
@@ -51,13 +52,13 @@ app.post('/users', async (req, res) => {
   res.status(201).send(userCreated)
 });
 
-app.get('/users', async (req, res) => {
-  const userRepository = AppDataSource.getRepository(User)
+// app.get('/users', async (req, res) => {
+//   const userRepository = AppDataSource.getRepository(User)
 
-  const users = await userRepository.find()
+//   const users = await userRepository.find()
 
-  res.status(200).send(users)
-})
+//   res.status(200).send(users)
+// })
 
 app.post('/posts', async (req, res) => {
 // Crie o endpoint de posts
@@ -83,15 +84,15 @@ app.post('/posts', async (req, res) => {
   res.status(201).send(postCreated)
 });
 
-app.get('/posts', async (req, res) => {
-  const postRepository = AppDataSource.getRepository(Post)
+// app.get('/posts', async (req, res) => {
+//   const postRepository = AppDataSource.getRepository(Post)
 
-  const posts = await postRepository.find({
-    relations: ['user'],
-  })
+//   const posts = await postRepository.find({
+//     relations: ['user'],
+//   })
 
-  res.status(200).send(posts)
-})
+//   res.status(200).send(posts)
+// })
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
