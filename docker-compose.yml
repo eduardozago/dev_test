@@ -12,7 +12,7 @@ services:
       - DB_NAME=test_db
     depends_on:
       - db
-    stdin_open: true  # Mantém o stdin aberto para interatividade
+    stdin_open: true
     tty: true  
 
 
