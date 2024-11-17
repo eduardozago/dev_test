@@ -7,7 +7,7 @@ const axios_1 = __importDefault(require("axios"));
 const testUser = {
     firstName: "John",
     lastName: "Doe",
-    email: "john.doe5@example.com"
+    email: "john.doe@example.com"
 };
 let userId = null;
 async function testCreateUser() {

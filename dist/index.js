@@ -9,6 +9,7 @@ const express_1 = __importDefault(require("express"));
 const typeorm_1 = require("typeorm");
 const User_1 = require("./entity/User");
 const Post_1 = require("./entity/Post");
+const zod_1 = require("zod");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const AppDataSource = new typeorm_1.DataSource({
@@ -36,9 +37,13 @@ const initializeDatabase = async () => {
 };
 initializeDatabase();
 app.post('/users', async (req, res) => {
-    // Crie o endpoint de users
+    const userBodySchema = zod_1.z.object({
+        firstName: zod_1.z.string(),
+        lastName: zod_1.z.string(),
+        email: zod_1.z.string().email()
+    });
+    const { firstName, lastName, email } = userBodySchema.parse(req.body);
     const userRepository = AppDataSource.getRepository(User_1.User);
-    const { firstName, lastName, email } = req.body;
     const user = new User_1.User();
     user.firstName = firstName;
     user.lastName = lastName;
@@ -46,16 +51,15 @@ app.post('/users', async (req, res) => {
     const userCreated = await userRepository.save(user);
     res.status(201).send(userCreated);
 });
-app.get('/users', async (req, res) => {
-    const userRepository = AppDataSource.getRepository(User_1.User);
-    const users = await userRepository.find();
-    res.status(200).send(users);
-});
 app.post('/posts', async (req, res) => {
-    // Crie o endpoint de posts
+    const postBodySchema = zod_1.z.object({
+        title: zod_1.z.string(),
+        description: zod_1.z.string(),
+        userId: zod_1.z.number()
+    });
+    const { title, description, userId } = postBodySchema.parse(req.body);
     const postRepository = AppDataSource.getRepository(Post_1.Post);
     const userRepository = AppDataSource.getRepository(User_1.User);
-    const { title, description, userId } = req.body;
     const user = await userRepository.findOne({ where: { id: userId } });
     if (!user) {
         throw new Error('User not found');
@@ -66,13 +70,6 @@ app.post('/posts', async (req, res) => {
     post.user = user;
     const postCreated = await postRepository.save(post);
     res.status(201).send(postCreated);
-});
-app.get('/posts', async (req, res) => {
-    const postRepository = AppDataSource.getRepository(Post_1.Post);
-    const posts = await postRepository.find({
-        relations: ['user'],
-    });
-    res.status(200).send(posts);
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

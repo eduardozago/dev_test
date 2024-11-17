@@ -4,6 +4,7 @@ import express from 'express';
 import { DataSource } from 'typeorm';
 import { User } from './entity/User';
 import { Post } from './entity/Post';
+import { z } from 'zod';
 
 const app = express();
 app.use(express.json());
@@ -36,10 +37,15 @@ const initializeDatabase = async () => {
 initializeDatabase();
 
 app.post('/users', async (req, res) => {
-// Crie o endpoint de users
+  const userBodySchema = z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email()
+  })
+
+  const { firstName, lastName, email } = userBodySchema.parse(req.body)
+
   const userRepository = AppDataSource.getRepository(User)
-    
-  const { firstName, lastName, email } = req.body
 
   const user = new User()
 
@@ -52,20 +58,17 @@ app.post('/users', async (req, res) => {
   res.status(201).send(userCreated)
 });
 
-// app.get('/users', async (req, res) => {
-//   const userRepository = AppDataSource.getRepository(User)
-
-//   const users = await userRepository.find()
-
-//   res.status(200).send(users)
-// })
-
 app.post('/posts', async (req, res) => {
-// Crie o endpoint de posts
+  const postBodySchema = z.object({
+    title: z.string(),
+    description: z.string(),
+    userId: z.number()
+  })
+
+  const { title, description, userId } = postBodySchema.parse(req.body)
+
   const postRepository = AppDataSource.getRepository(Post)
   const userRepository = AppDataSource.getRepository(User)
-    
-  const { title, description, userId } = req.body
 
   const user = await userRepository.findOne({ where: { id: userId }})
 
@@ -83,16 +86,6 @@ app.post('/posts', async (req, res) => {
 
   res.status(201).send(postCreated)
 });
-
-// app.get('/posts', async (req, res) => {
-//   const postRepository = AppDataSource.getRepository(Post)
-
-//   const posts = await postRepository.find({
-//     relations: ['user'],
-//   })
-
-//   res.status(200).send(posts)
-// })
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
